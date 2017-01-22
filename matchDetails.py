@@ -5,7 +5,7 @@ import time
 import requests
 
 '''
-terminal command: python matchDetails user
+terminal command: python matchDetails.py user
 
 user: the specified user name which is used to gather both api key and matchId files.
 '''
@@ -18,8 +18,13 @@ api = string.replace(api,'\n','')
 k.close()
 
 '''
-The file containing matchIds should be the file path going into path variable, with each matchId being separated by \n.
+This code assumes the following (assuming user phreak):
+- The file containing the matchIds to query with are stored in phreakData/midNoDup.txt
+- matchId are being separated by \n within minNoDup.txt
+- Match details (more specifically, team compositions and the winner) are stored as a json string format in phreakData/matchDetails.txt, each match separated by the '\n' character
+- If the program recieves the KeyboardInterrupt (typically ctrl-c), it will write all match details currently in matches variable into matchDetails.txt before closing.
 '''
+
 path = user+'Data/midNoDup.txt'
 mids = open(path)
 
@@ -39,10 +44,6 @@ try:
                 print(e);
             if r.status_code is 200:
                 success = 1
-                '''
-                Collects the data relevent to whetever match data you wish to collect.
-                e.g. collecting the team compositions, as well as which team won (implemented below)
-                '''                
                 m = r.json()
                 red = []
                 blue = []

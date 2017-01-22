@@ -3,13 +3,25 @@ import json
 import time
 import string
 import sys
+'''
+Terminal command: python matchList.py user
 
+user: name of the user folder in which api key is stored (see line 12)
+'''
 i = sys.argv[1]
 k = 'UserData/'+i+'/userData.txt'
 k = open(k)
 api = k.readline()
 api = string.replace(api,'\n','')
 k.close()
+'''
+The for loop assumes the following (assuming user is johndoe):
+- All summonerIds you wish to query are in  johndoeData/CHALLENGER/CHALLENGERmaster.txt
+    - CHALLENGER can be replaced by any other tier, in all capital letters
+- Each tier's master.txt file contained summonerids, separated by the '\n' character
+- Matches found will go into johndoeData/CHALLENGER/mid.txt, each separated by the '\n' character.
+'''
+
 try:
     for j in ['CHALLENGER','MASTER','GOLD','PLATINUM','DIAMOND']:
         path = i+'Data/'+j+'/'+j+'master.txt'
@@ -32,6 +44,8 @@ try:
                     print('RequestException');
                 
                 if r.status_code is 200:
+                    ''' can be changed to include any other data you wish from the API's matchlist request 
+                    The example shown below gets just the list of matchIds played by summonerid in the 2017 Preseason'''
                     success = 1
                     b = r.json()
                     z = 0;
