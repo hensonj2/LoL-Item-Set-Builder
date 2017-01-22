@@ -1,60 +1,82 @@
 import json
-import mongo
 import sys
 import string
 import time
 import requests
 
+'''
+terminal command: python matchDetails user
+
+user: the specified user name which is used to gather both api key and matchId files.
+'''
+
 user = sys.argv[1]
 k = 'UserData/'+user+'/userData.txt'
-api = k.readLine()
+k = open(k)
+api = k.readline()
 api = string.replace(api,'\n','')
 k.close()
 
+'''
+The file containing matchIds should be the file path going into path variable, with each matchId being separated by \n.
+'''
 path = user+'Data/midNoDup.txt'
 mids = open(path)
 
 matches = {}
 
-for match in mids:
-    match = string.replace(match,'\n','')
-    l = time.time()
-
-    success = 0
-
-    while success = 0:
-        try:
-            r = requests.get('https://na.api.pvp.net/api/lol/na/v2.2/match/'+match+'?api_key='+api)
-        except requests.exceptions.RequestException as e:
-            print(e);
-
-        if r.status_code is 200:
-            #Collect all data, or relevent data?
-            success = 1
-            m = r.json()
-            red = []
-            blue = []
-            winner = -1
-                
-            for p in m["participants"]:
-                if p["teamId"] is 100:
-                    blue.append(p["championId"])
-                    if winner == "" and p["stats"]["winner"] == true:
-                        winner = 0
+try:    
+    for match in mids:
+        match = string.replace(match,'\n','')
+        l = time.time()        
+        success = 0
+        print(str(match))
+        
+        while success == 0:            
+            try:
+                r = requests.get('https://na.api.pvp.net/api/lol/na/v2.2/match/'+match+'?api_key='+api)
+            except requests.exceptions.RequestException as e:
+                print(e);
+            if r.status_code is 200:
+                success = 1
+                '''
+                Collects the data relevent to whetever match data you wish to collect.
+                e.g. collecting the team compositions, as well as which team won (implemented below)
+                '''                
+                m = r.json()
+                red = []
+                blue = []
+                winner = -1                
+                for p in m["participants"]:
+                    if p["teamId"] is 100:
+                        blue.append(p["championId"])
+                        if winner == "" and p["stats"]["winner"] == true:
+                            winner = 0
                     else:
-                    red.append(p['championId'])
-                    if winner == "" and p["stats"]["winner"] == true:
-                        winner = 1
-            matches.update({match:{'red':red, 'blue':blue, 'winner':winner}})
-        elif r.status_code not in [429,500,503]:
-            print(str(r.status_code)+' error, trying again')
-        else:
-            print(str(r.status_code)+' error, moving on')
+                        red.append(p['championId'])
+                        if winner == "" and p["stats"]["winner"] == true:
+                            winner = 1
+                matches.update({match:{'red':red, 'blue':blue, 'winner':winner}})
+                
+            elif (r.status_code == 429) or (r.status_code == 500) or (r.status_code == 503):
+                print(str(r.status_code)+' error, trying again')
+            else:
+                success = 1
+                print(str(r.status_code)+' error, moving on')
+            
             while (time.time() - l < 1.2):
+                '''
+                1.2 is the interval in seconds determined by the 500 calls:10 minutes ratio.
+                Change according to slowest api rate limit for whichever key you're using.
+                '''
                 pass
-path = user+'Data/mDetails.txt'
-mDeets = open(path, 'w')
+
+except KeyboardInterrupt:
+    print('Keyboard Interrupt, closing')
+
+path = user+'Data/matchDetails.txt'
+mDeets = open(path, 'w')    
 for match in matches:
     mDeets.write(str(match)+'\n')
 print('done')
-            
+    
