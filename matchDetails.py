@@ -30,6 +30,10 @@ mids = open(path)
 
 matches = {}
 
+
+path = user+'Data/matchDetails.txt'
+mDeets = open(path, 'w')    
+
 try:    
     for match in mids:
         match = string.replace(match,'\n','')
@@ -51,13 +55,14 @@ try:
                 for p in m["participants"]:
                     if p["teamId"] is 100:
                         blue.append(p["championId"])
-                        if winner == "" and p["stats"]["winner"] == true:
+                        if winner == -1 and p["stats"]["winner"] == True:
                             winner = 0
                     else:
                         red.append(p['championId'])
-                        if winner == "" and p["stats"]["winner"] == true:
+                        if winner == -1 and p["stats"]["winner"] == True:
                             winner = 1
-                matches.update({match:{'red':red, 'blue':blue, 'winner':winner}})
+                
+                mDeets.write(str({match:{'red':red, 'blue':blue, 'winner':winner}})+'\n')
                 
             elif (r.status_code == 429) or (r.status_code == 500) or (r.status_code == 503):
                 print(str(r.status_code)+' error, trying again')
@@ -75,9 +80,6 @@ try:
 except KeyboardInterrupt:
     print('Keyboard Interrupt, closing')
 
-path = user+'Data/matchDetails.txt'
-mDeets = open(path, 'w')    
-for match in matches:
-    mDeets.write(str(match)+'\n')
+mDeets.close()
 print('done')
     
