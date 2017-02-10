@@ -31,17 +31,17 @@ mids = open(path)
 matches = {}
 
 
-path = user+'Data/matchDetails.txt'
+path = user+'Data/matchDetails_new.txt'
 mDeets = open(path, 'w')    
 
 try:    
     for match in mids:
         match = string.replace(match,'\n','')
-        l = time.time()        
+        print(match)
         success = 0
-        print(str(match))
         
         while success == 0:            
+            l = time.time()        
             try:
                 r = requests.get('https://na.api.pvp.net/api/lol/na/v2.2/match/'+match+'?api_key='+api)
             except requests.exceptions.RequestException as e:
@@ -69,14 +69,13 @@ try:
             else:
                 success = 1
                 print(str(r.status_code)+' error, moving on')
-            
-            while (time.time() - l < 1.2):
-                '''
-                1.2 is the interval in seconds determined by the 500 calls:10 minutes ratio.
-                Change according to slowest api rate limit for whichever key you're using.
-                '''
-                pass
 
+            t = time.time() - l
+            while (t <= 2 ):
+                t = time.time() - l
+            if (t <= 2):
+                print(t)
+                
 except KeyboardInterrupt:
     print('Keyboard Interrupt, closing')
 
