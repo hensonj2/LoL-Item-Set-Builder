@@ -71,9 +71,9 @@ try:
                 print(str(r.status_code)+' error, moving on')
 
             t = time.time() - l
-            while (t <= 2 ):
+            while (t <= 1.2):
                 t = time.time() - l
-            if (t <= 2):
+            if (t <= 1.2):
                 print(t)
                 
 except KeyboardInterrupt:
