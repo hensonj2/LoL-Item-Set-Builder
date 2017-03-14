@@ -34,10 +34,12 @@ matches = {}
 path = user+'Data/matchDetails_new.txt'
 mDeets = open(path, 'w')    
 
-try:    
+matches = []
+i = 0
+try:
+    print('Running...')
     for match in mids:
         match = string.replace(match,'\n','')
-        print(match)
         success = 0
         
         while success == 0:            
@@ -64,6 +66,7 @@ try:
                 
                 mDeets.write(str({match:{'red':red, 'blue':blue, 'winner':winner}})+'\n')
                 
+
             elif (r.status_code == 429) or (r.status_code == 500) or (r.status_code == 503):
                 print(str(r.status_code)+' error, trying again')
             else:
@@ -71,14 +74,13 @@ try:
                 print(str(r.status_code)+' error, moving on')
 
             t = time.time() - l
-            while (t <= 1.2):
+            while (t <= .007):
                 t = time.time() - l
-            if (t <= 1.2):
-                print(t)
-                
+        
 except KeyboardInterrupt:
-    print('Keyboard Interrupt, closing')
+    print('Keyboard Interrupt, stopping requests')
 
 mDeets.close()
+mids.close()
 print('done')
     
